@@ -111,31 +111,3 @@ class Machine
 			\onEnter Current, ... if Enter
 
 	initial: (S) => @InitialState = S.Name
-
-X = Machine
-	States:
-		Open: =>
-			@on 'close', 'Closed'
-			@entry -> print 'opened'
-
-		Closed: =>
-			@initial!
-
-			@entry -> print 'closed'
-			@exit -> print 'going to open'
-
-			@on 'open', 'Open'
-
-			@substate
-				Idle: =>
-					@on 'start', 'Cooking'
-					@entry -> print 'idle'
-					@initial!
-
-				Cooking: =>
-					@entry -> print 'cooking now'
-					@exit -> print 'not cooking'
-					@on 'stop', 'Idle'
-
-X\input 'start'
-X\input 'open'

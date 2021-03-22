@@ -225,44 +225,5 @@ do
   })
   _base_0.__class = _class_0
   Machine = _class_0
+  return _class_0
 end
-local X = Machine({
-  States = {
-    Open = function(self)
-      self:on('close', 'Closed')
-      return self:entry(function()
-        return print('opened')
-      end)
-    end,
-    Closed = function(self)
-      self:initial()
-      self:entry(function()
-        return print('closed')
-      end)
-      self:exit(function()
-        return print('going to open')
-      end)
-      self:on('open', 'Open')
-      return self:substate({
-        Idle = function(self)
-          self:on('start', 'Cooking')
-          self:entry(function()
-            return print('idle')
-          end)
-          return self:initial()
-        end,
-        Cooking = function(self)
-          self:entry(function()
-            return print('cooking now')
-          end)
-          self:exit(function()
-            return print('not cooking')
-          end)
-          return self:on('stop', 'Idle')
-        end
-      })
-    end
-  }
-})
-X:input('start')
-return X:input('open')
