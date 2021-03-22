@@ -1,11 +1,6 @@
 
 # Machine
-*A state machine written in MoonScript*
-
-**Importing with [Neon](https://github.com/Belkworks/NEON)**:
-```lua
-_ = NEON:github('belkworks', 'machine')
-```
+*A state machine written in MoonScript*  
 
 This module is in progress and the API is still evolving!  
 Documentation will come soon.
@@ -51,4 +46,9 @@ cooking now
 not cooking
 going to open
 opened
+```
+
+**Importing with [Neon](https://github.com/Belkworks/NEON)**:
+```lua
+Machine = NEON:github('belkworks', 'machine')
 ```
