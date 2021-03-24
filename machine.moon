@@ -77,6 +77,9 @@ class Machine
 	new: (Config = {}) =>
 		defaults Config, States: {}, Data: {}
 		@States = {}
+		
+		@Data = Config.Data
+
 		@Root = not Config.Submachine
 		for Name, Runner in pairs Config.States
 			@addState State Name, Runner

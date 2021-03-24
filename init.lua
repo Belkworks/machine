@@ -204,6 +204,7 @@ do
         Data = { }
       })
       self.States = { }
+      self.Data = Config.Data
       self.Root = not Config.Submachine
       for Name, Runner in pairs(Config.States) do
         self:addState(State(Name, Runner))
