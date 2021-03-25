@@ -173,12 +173,12 @@ do
         return Old
       end
     end,
-    transition = function(self, StateName, Enter, ...)
-      if Enter == nil then
-        Enter = true
-      end
+    transition = function(self, StateName, ...)
       local S = self.States[StateName]
       assert(S, ':transition couldnt find state ' .. StateName)
+      if S == self.State then
+        return 
+      end
       local Current = self:exitCurrent(S)
       do
         local _with_0 = S
@@ -211,7 +211,7 @@ do
       end
       assert(self.InitialState, 'No state declared as default!')
       if not (Config.Submachine) then
-        return self:transition(self.InitialState, true)
+        return self:transition(self.InitialState)
       end
     end,
     __base = _base_0,

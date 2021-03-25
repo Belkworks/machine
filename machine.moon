@@ -85,7 +85,7 @@ class Machine
 			@addState State Name, Runner
 
 		assert @InitialState, 'No state declared as default!'
-		@transition @InitialState, true unless Config.Submachine
+		@transition @InitialState unless Config.Submachine
 
 	addState: (S, ...) =>
 		assert not @States[S.Name], 'cannot have duplicate states!'
@@ -103,9 +103,10 @@ class Machine
 			@State = nil
 			\onExit New if Old
 
-	transition: (StateName, Enter = true, ...) =>
+	transition: (StateName, ...) =>
 		S = @States[StateName]
 		assert S, ':transition couldnt find state '..StateName
+		return if S == @State
 
 		Current = @exitCurrent S
 		
