@@ -2,116 +2,116 @@
 -- SFZILabs 2021
 
 defaults = (Object, Props) ->
-	Object[i] = v for i, v in pairs Props when nil == Object[i]
+    Object[i] = v for i, v in pairs Props when nil == Object[i]
 
 Machine = nil
 
 class State
-	new: (@Name, @Runner) => @Hooks = {}
-	init: (...) =>
-		@exit (...) ->
-			if @Substate
-				@Substate\exitCurrent ...
+    new: (@Name, @Runner) => @Hooks = {}
+    init: (...) =>
+        @exit (...) ->
+            if @Substate
+                @Substate\exitCurrent ...
 
-		@Runner ...
+        @Runner ...
 
-		@entry (V,...) ->
-			if S = @Substate
-				if Initial = S.InitialState
-					S\transition Initial, ...
-	
-	setParent: (@Machine) => @Data = @Machine.Data
-	
-	initial: => @Machine\initial @
+        @entry (V,...) ->
+            if S = @Substate
+                if Initial = S.InitialState
+                    S\transition Initial, ...
 
-	substate: (@States) =>
-		@Substate = Machine States: @States, Data: @Data, Submachine: true
+    setParent: (@Machine) => @Data = @Machine.Data
+    
+    initial: => @Machine\initial @
 
-	entry: (Fn) => table.insert @Hooks, onEnter: Fn
-	exit: (Fn) => table.insert @Hooks, onExit: Fn
+    substate: (@States) =>
+        @Substate = Machine States: @States, Data: @Data, Submachine: true
 
-	onEnter: (Prev, ...) =>
-		return if @Active
-		return if Prev == @
-		@Active = true
-		for H in *@Hooks
-			if H.onEnter
-				H.onEnter @, Prev, ...
+    entry: (Fn) => table.insert @Hooks, onEnter: Fn
+    exit: (Fn) => table.insert @Hooks, onExit: Fn
 
-	onExit: (Next, ...) =>
-		return unless @Active
-		return if Next == @
-		@Active = false
-		for H in *@Hooks
-			if H.onExit
-				H.onExit @, ...
+    onEnter: (Prev, ...) =>
+        return if @Active
+        return if Prev == @
+        @Active = true
+        for H in *@Hooks
+            if H.onEnter
+                H.onEnter @, Prev, ...
 
-	on: (Event, GuardOrState, State) =>
-		assert GuardOrState, ':on expects a guard or a state!'
-		T = Name: Event, State: GuardOrState
-		if 'function' == type GuardOrState
-			assert State, ':on expects a state after a guard!'
-			T.Guard = GuardOrState
-			T.State = State
+    onExit: (Next, ...) =>
+        return unless @Active
+        return if Next == @
+        @Active = false
+        for H in *@Hooks
+            if H.onExit
+                H.onExit @, ...
 
-		table.insert @Hooks, T
+    on: (Event, GuardOrState, State) =>
+        assert GuardOrState, ':on expects a guard or a state!'
+        T = Name: Event, State: GuardOrState
+        if 'function' == type GuardOrState
+            assert State, ':on expects a state after a guard!'
+            T.Guard = GuardOrState
+            T.State = State
 
-	input: (Event, ...) =>
-		for H in *@Hooks
-			if H.Name == Event
-				if H.Guard
-					if H.Guard @
-						return @transition H.State, ...
-				else return @transition H.State, ...
+        table.insert @Hooks, T
 
-		if @Substate
-			Change = @Substate\input Event, ...
-			return if Change
+    input: (Event, ...) =>
+        for H in *@Hooks
+            if H.Name == Event
+                if H.Guard
+                    if H.Guard @
+                        return @transition H.State, ...
+                else return @transition H.State, ...
 
-		-- error "Unhandled event #{Event} in #{@Name}"
+        if @Substate
+            Change = @Substate\input Event, ...
+            return if Change
 
-	transition: (NewState, ...) =>
-		@Machine\transition NewState
+        -- error "Unhandled event #{Event} in #{@Name}"
+
+    transition: (NewState, ...) =>
+        @Machine\transition NewState
 
 class Machine
-	new: (Config = {}) =>
-		defaults Config, States: {}, Data: {}
-		@States = {}
-		
-		@Data = Config.Data
+    new: (Config = {}) =>
+        defaults Config, States: {}, Data: {}
+        @States = {}
+        
+        @Data = Config.Data
 
-		@Root = not Config.Submachine
-		for Name, Runner in pairs Config.States
-			@addState State Name, Runner
+        @Root = not Config.Submachine
+        for Name, Runner in pairs Config.States
+            @addState State Name, Runner
 
-		assert @InitialState, 'No state declared as default!'
-		@transition @InitialState unless Config.Submachine
+        assert @InitialState, 'No state declared as default!'
+        @transition @InitialState unless Config.Submachine
 
-	addState: (S, ...) =>
-		assert not @States[S.Name], 'cannot have duplicate states!'
-		@States[S.Name] = S
-		with S
-			\setParent @
-			\init ...
+    addState: (S, ...) =>
+        assert not @States[S.Name], 'cannot have duplicate states!'
+        @States[S.Name] = S
+        with S
+            \setParent @
+            \init ...
 
-	input: (Event, ...) =>
-		assert type(Event) == 'string', ':input expects a state!'
-		@State\input Event, ...
+    input: (Event, ...) =>
+        assert type(Event) == 'string', ':input expects a state!'
+        @State\input Event, ...
 
-	exitCurrent: (New) => -- New -> Old
-		with Old = @State
-			@State = nil
-			\onExit New if Old
+    exitCurrent: (New) => -- New -> Old
+        with Old = @State
+            @State = nil
+            \onExit New if Old
 
-	transition: (StateName, ...) =>
-		S = @States[StateName]
-		assert S, ':transition couldnt find state '..StateName
-		return if S == @State
+    transition: (StateName, ...) =>
+        S = @States[StateName]
+        assert S, ':transition couldnt find state '..StateName
+        return if S == @State
 
-		Current = @exitCurrent S
-		
-		with S
-			@State = S
-			\onEnter Current, ... if Enter
+        Current = @exitCurrent S
+        
+        with S
+            @State = S
+            \onEnter Current, ... if Enter
 
-	initial: (S) => @InitialState = S.Name
+    initial: (S) => @InitialState = S.Name
