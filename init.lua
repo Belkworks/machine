@@ -183,9 +183,7 @@ do
       do
         local _with_0 = S
         self.State = S
-        if Enter then
-          _with_0:onEnter(Current, ...)
-        end
+        _with_0:onEnter(Current, ...)
         return _with_0
       end
     end,

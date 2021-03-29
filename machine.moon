@@ -112,6 +112,6 @@ class Machine
         
         with S
             @State = S
-            \onEnter Current, ... if Enter
+            \onEnter Current, ...
 
     initial: (S) => @InitialState = S.Name
