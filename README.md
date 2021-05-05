@@ -36,6 +36,12 @@ The above snippet defines a machine with two state, `Idle` and `Working`.
 A state's behavior is defined in its state constructor.  
 All of the states logic should be defined here.  
 
+The reference to the scratch pad is at `state.Data`.
+```lua
+Idle = function(state)
+    state.Data.test = 123
+end
+```
 
 **initial**: `state:initial() -> nil`  
 Sets the state as the machine's initial state.  
