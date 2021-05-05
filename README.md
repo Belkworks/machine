@@ -80,7 +80,7 @@ Idle = function(state)
 end
 ```
 
-**entry**: `state:entry(function) -> nil`
+**entry**: `state:entry(function) -> nil`  
 Add `function` as an entry hook to the state.  
 Whenever the state is entered, `function` will be called.  
 The hook will receive the previous state and any parameters that caused the state change.  
@@ -147,7 +147,7 @@ end
 
 **input**: `state:input(event, ...) -> State?`  
 Runs all rules for `event` until it runs out or one causes a state transition.  
-Also passes input to it's sub-Machine, if it exists.
+Also passes input to it's sub-Machine, if it exists.  
 Returns the new state if the Machine transitions.  
 **NOTE**: It is preferable to run events using the `machine:input` method described below.
 ```lua
@@ -169,7 +169,7 @@ Returns the new state of the Machine, if a state transition occurred.
 machine:input('work')
 ```
 
-**transition**: `machine:transition(newState, ...) -> State`
+**transition**: `machine:transition(newState, ...) -> State`  
 Force a state transition to the state named `newState` in the Machine.  
 **NOTE**: It is preferable to cause transitions using `state:on` rules.
 ```lua
@@ -205,8 +205,8 @@ machine = Machine({
                     sub:exit(function() print('not cooking') end)
                     sub:on('stop', 'Idle')
                 end
-            }
-    end
+            })
+        end
     }
 })
 
