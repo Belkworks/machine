@@ -57,6 +57,11 @@ do
         onExit = Fn
       })
     end,
+    event = function(self, Fn)
+      return table.insert(self.Hooks, {
+        onEvent = Fn
+      })
+    end,
     onEnter = function(self, Prev, ...)
       if self.Active then
         return 
@@ -85,7 +90,16 @@ do
       for _index_0 = 1, #_list_0 do
         local H = _list_0[_index_0]
         if H.onExit then
-          H.onExit(self, ...)
+          H.onExit(self, Next, ...)
+        end
+      end
+    end,
+    onEvent = function(self, ...)
+      local _list_0 = self.Hooks
+      for _index_0 = 1, #_list_0 do
+        local H = _list_0[_index_0]
+        if H.onEvent then
+          H.onEvent(self, ...)
         end
       end
     end,
@@ -117,11 +131,11 @@ do
         end
       end
       if self.Substate then
-        local Change = self.Substate:input(Event, ...)
-        if Change then
+        if self.Substate:input(Event, ...) then
           return 
         end
       end
+      return self:onEvent(Event, ...)
     end,
     transition = function(self, NewState, ...)
       return self.Machine:transition(NewState)

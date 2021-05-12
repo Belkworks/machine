@@ -29,6 +29,7 @@ class State
 
     entry: (Fn) => table.insert @Hooks, onEnter: Fn
     exit: (Fn) => table.insert @Hooks, onExit: Fn
+    event: (Fn) => table.insert @Hooks, onEvent: Fn
 
     onEnter: (Prev, ...) =>
         return if @Active
@@ -44,7 +45,12 @@ class State
         @Active = false
         for H in *@Hooks
             if H.onExit
-                H.onExit @, ...
+                H.onExit @, Next, ...
+
+    onEvent: (...) =>
+        for H in *@Hooks
+            if H.onEvent
+                H.onEvent @, ...
 
     on: (Event, GuardOrState, State) =>
         assert GuardOrState, ':on expects a guard or a state!'
@@ -65,10 +71,9 @@ class State
                 else return @transition H.State, ...
 
         if @Substate
-            Change = @Substate\input Event, ...
-            return if Change
+            return if @Substate\input Event, ...
 
-        -- error "Unhandled event #{Event} in #{@Name}"
+        @onEvent Event, ...
 
     transition: (NewState, ...) =>
         @Machine\transition NewState
