@@ -89,7 +89,7 @@ end
 **entry**: `state:entry(function) -> nil`  
 Add `function` as an entry hook to the state.  
 Whenever the state is entered, `function` will be called.  
-The hook will receive the previous state and any parameters that caused the state change.  
+The hook will receive its state, the exiting state, and any parameters involved in the state change.  
 There can be many entry hooks in a state.
 ```lua
 Idle = function(state)
@@ -102,7 +102,7 @@ end
 
 **exit**: `state:exit(function) -> nil`  
 Like **entry**, but adds a hook for state exit.  
-The hook will receive the state that is succeeding it and any parameters that caused the state change.
+The hook will receive its state, the future state, and any parameters involved in the state change.
 ```lua
 Idle = function(state)
     state:initial()
@@ -134,6 +134,17 @@ Idle = function(state)
             sub:on('wake', 'Awake')
         end
     })
+end
+```
+
+**event**: `state:event(function) -> nil`  
+Add `function` as a hook for events that do not cause a transition.  
+There can be many event hooks.
+```lua
+Idle = function(state)
+    state:event(function(event, ...)
+        print(event, 'wasnt handled!')
+    end
 end
 ```
 
